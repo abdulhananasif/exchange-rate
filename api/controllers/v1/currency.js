@@ -31,7 +31,32 @@ const createCurrency = async (req, res) => {
   res.status(response.status).json(response.json);
 };
 
-const deleteCurrency = (req, res) => {};
+const deleteCurrency = async (req, res) => {
+  let response = {};
+  const schema = Joi.object({
+    currencyCode: Joi.string().required().messages({
+      'string.base': 'Currency code must be a string',
+      'any.required': 'Currency code is required',
+    }),
+  });
+  try {
+    await schema.validateAsync(req.params);
+    const {currencyCode} = req.params;
+    currencies = currencies.filter(
+      (currency) => currencyCode !== currency.currencyCode
+    );
+    response.status = 200;
+    response.json = {message: 'Currency deleted successsfully'};
+  } catch (err) {
+    let errorMessage = '';
+    err.details.forEach((error) => {
+      errorMessage += error.message;
+    });
+    response.status = 400;
+    response.json = {errorMessage};
+  }
+  res.status(response.status).json(response.json);
+};
 
 const editCurrency = async (req, res) => {
   let response = {};
