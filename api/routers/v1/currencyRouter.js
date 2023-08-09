@@ -11,6 +11,6 @@ currencyRouter.use(bodyParser.json());
 
 currencyRouter.route('/add').post(createCurrency);
 currencyRouter.route('/edit').put(editCurrency);
-currencyRouter.route('/delete').delete(deleteCurrency);
+currencyRouter.route('/delete/:currencyCode').delete(deleteCurrency);
 
 module.exports = currencyRouter;
