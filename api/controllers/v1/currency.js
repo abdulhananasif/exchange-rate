@@ -65,7 +65,7 @@ const editCurrency = async (req, res) => {
       'string.base': 'Currency code must be a string',
       'any.required': 'Currency code is required',
     }),
-    newExchangeRate: Joi.number().required().messages({
+    newExchangeRate: Joi.number().messages({
       'number.base': 'New exchange Rate must be a number',
       'any.required': 'New exchange Rate is required',
     }),
@@ -82,7 +82,9 @@ const editCurrency = async (req, res) => {
         currency.currencyCode = newCurrencyCode
           ? newCurrencyCode
           : currencyCode;
-        currency.exchangeRate = newExchangeRate;
+        currency.exchangeRate = newExchangeRate
+          ? newExchangeRate
+          : currency.exchangeRate;
       }
       return currency;
     });
