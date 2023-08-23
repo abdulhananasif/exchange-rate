@@ -73,8 +73,14 @@ const editCurrency = async (req, res) => {
       'string.base': 'New currency code must be a string',
       'any.required': 'New currency code is required',
     }),
-  });
+  })
+    .or('newCurrencyCode', 'newExchangeRate')
+    .messages({
+      'object.missing':
+        'At least one of newCurrencyCode or newExchangeRate is required with currencyCode',
+    });
   try {
+    let isCurrencyUpdated = false;
     await schema.validateAsync(req.body);
     const {currencyCode, newExchangeRate, newCurrencyCode} = req.body;
     currencies = currencies.map((currency) => {
@@ -85,17 +91,25 @@ const editCurrency = async (req, res) => {
         currency.exchangeRate = newExchangeRate
           ? newExchangeRate
           : currency.exchangeRate;
+        isCurrencyUpdated = true;
       }
       return currency;
     });
-
-    response.status = 200;
-    response.json = currencies;
+    if (isCurrencyUpdated) {
+      response.status = 200;
+      response.json = currencies;
+    } else {
+      throw {message: 'Currency not found'};
+    }
   } catch (err) {
     let errorMessage = '';
-    err.details.forEach((error) => {
-      errorMessage += error.message;
-    });
+    if (err.message) {
+      errorMessage = err.message;
+    } else {
+      err.details.forEach((error) => {
+        errorMessage += error.message;
+      });
+    }
     response.status = 400;
     response.json = {errorMessage};
   }
