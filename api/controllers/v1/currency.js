@@ -69,7 +69,7 @@ const editCurrency = async (req, res) => {
       'number.base': 'New exchange Rate must be a number',
       'any.required': 'New exchange Rate is required',
     }),
-    newCurrencyCode: Joi.string().required().messages({
+    newCurrencyCode: Joi.string().messages({
       'string.base': 'New currency code must be a string',
       'any.required': 'New currency code is required',
     }),
@@ -79,7 +79,9 @@ const editCurrency = async (req, res) => {
     const {currencyCode, newExchangeRate, newCurrencyCode} = req.body;
     currencies = currencies.map((currency) => {
       if (currencyCode === currency.currencyCode) {
-        currency.currencyCode = newCurrencyCode;
+        currency.currencyCode = newCurrencyCode
+          ? newCurrencyCode
+          : currencyCode;
         currency.exchangeRate = newExchangeRate;
       }
       return currency;
