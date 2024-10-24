@@ -1,21 +1,10 @@
-const Joi = require('joi');
-
 let {currencies} = require('../../commonVariables');
+const { exchangeRateSchema } = require('../../validation/exchangeRate');
 
 const exchangeRateConversion = async (req, res) => {
   let response = {};
-  const schema = Joi.object({
-    currencyCode: Joi.string().required().messages({
-      'string.base': 'Currency code must be a string',
-      'any.required': 'Currency code is required',
-    }),
-    amount: Joi.number().required().messages({
-      'number.base': 'Amount must be a number',
-      'any.required': 'Amount is required',
-    }),
-  });
   try {
-    await schema.validateAsync(req.query);
+    await exchangeRateSchema.validateAsync(req.query);
     const {currencyCode, amount} = req.query;
     const foundcurrency = currencies.find(
       (curency) => curency.currencyCode === currencyCode

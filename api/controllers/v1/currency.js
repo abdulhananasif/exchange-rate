@@ -1,21 +1,10 @@
-const Joi = require('joi');
-
 let {currencies} = require('../../commonVariables');
+const { addCurrencySchema, deleteCurrencySchema, editCurrencySchema } = require('../../validation/currency');
 
 const createCurrency = async (req, res) => {
   let response = {};
-  const schema = Joi.object({
-    currencyCode: Joi.string().required().messages({
-      'string.base': 'Currency code must be a string',
-      'any.required': 'Currency code is required',
-    }),
-    exchangeRate: Joi.number().required().messages({
-      'number.base': 'Exchange Rate must be a number',
-      'any.required': 'Exchange Rate is required',
-    }),
-  });
   try {
-    await schema.validateAsync(req.body);
+    await addCurrencySchema.validateAsync(req.body);
     const {currencyCode, exchangeRate} = req.body;
     currencies.push({currencyCode, exchangeRate});
     response.status = 201;
@@ -33,14 +22,8 @@ const createCurrency = async (req, res) => {
 
 const deleteCurrency = async (req, res) => {
   let response = {};
-  const schema = Joi.object({
-    currencyCode: Joi.string().required().messages({
-      'string.base': 'Currency code must be a string',
-      'any.required': 'Currency code is required',
-    }),
-  });
   try {
-    await schema.validateAsync(req.params);
+    await deleteCurrencySchema.validateAsync(req.params);
     const {currencyCode} = req.params;
     currencies = currencies.filter(
       (currency) => currencyCode !== currency.currencyCode
@@ -60,28 +43,9 @@ const deleteCurrency = async (req, res) => {
 
 const editCurrency = async (req, res) => {
   let response = {};
-  const schema = Joi.object({
-    currencyCode: Joi.string().required().messages({
-      'string.base': 'Currency code must be a string',
-      'any.required': 'Currency code is required',
-    }),
-    newExchangeRate: Joi.number().messages({
-      'number.base': 'New exchange Rate must be a number',
-      'any.required': 'New exchange Rate is required',
-    }),
-    newCurrencyCode: Joi.string().messages({
-      'string.base': 'New currency code must be a string',
-      'any.required': 'New currency code is required',
-    }),
-  })
-    .or('newCurrencyCode', 'newExchangeRate')
-    .messages({
-      'object.missing':
-        'At least one of newCurrencyCode or newExchangeRate is required with currencyCode',
-    });
   try {
     let isCurrencyUpdated = false;
-    await schema.validateAsync(req.body);
+    await editCurrencySchema.validateAsync(req.body);
     const {currencyCode, newExchangeRate, newCurrencyCode} = req.body;
     currencies = currencies.map((currency) => {
       if (currencyCode === currency.currencyCode) {
